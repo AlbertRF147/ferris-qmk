@@ -1,4 +1,5 @@
 #include "keycodes.h"
+#include "keymap_us.h"
 #include QMK_KEYBOARD_H
 
 /* THIS FILE WAS GENERATED!
@@ -10,7 +11,6 @@
 enum {
     TD_A_ESC,
     TD_SPC_DOT,
-    TD_DOT_COLN,
     TD_COMM_SCLN
 };
 
@@ -19,7 +19,6 @@ tap_dance_action_t tap_dance_actions[] = {
     // Tap once for Escape, twice for Caps Lock
     [TD_A_ESC] = ACTION_TAP_DANCE_DOUBLE( KC_A, KC_ESC ),
     [TD_SPC_DOT] = ACTION_TAP_DANCE_DOUBLE( KC_SPC, KC_DOT ),
-    [TD_DOT_COLN] = ACTION_TAP_DANCE_DOUBLE( KC_DOT, KC_COLN ),
     [TD_COMM_SCLN] = ACTION_TAP_DANCE_DOUBLE( KC_COMM, KC_SCLN ),
 };
 
@@ -28,29 +27,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_split_3x5_2(
 		KC_Q            ,	KC_W           ,	KC_E           ,	KC_R           ,	KC_T          ,	KC_Y          ,	KC_U          ,	KC_I            ,	KC_O           ,	KC_P        ,
 		TD( TD_A_ESC )  ,	LSFT_T( KC_S ) ,	LCTL_T( KC_D ) ,	LGUI_T( KC_F ) ,	LALT_T( KC_G ),	RALT_T( KC_H ),	RGUI_T( KC_J ),	RCTL_T( KC_K )  ,	RSFT_T( KC_L ) ,	KC_TAB      ,
-		KC_Z            ,	KC_X           ,	KC_C           ,	KC_V           ,	KC_B          ,	KC_N          ,	KC_M          ,	TD(TD_COMM_SCLN),	TD(TD_DOT_COLN),	KC_CAPS_LOCK,
+		KC_Z            ,	KC_X           ,	KC_C           ,	KC_V           ,	KC_B          ,	KC_N          ,	KC_M          ,	TD(TD_COMM_SCLN),	TD(TD_COMM_SCLN),	KC_CAPS_LOCK,
 		LT( 4, KC_BSPC ),	LT( 1, KC_ENT ),	LT( 2, KC_SPC ),	LT( 3, KC_BSPC)
 	),
     [1] = LAYOUT_split_3x5_2(
 		KC_EXLM,	KC_AT  ,	KC_HASH,	KC_DLR ,	KC_PERC,	KC_CIRC,	KC_AMPR,	KC_ASTR,	KC_PLUS,	KC_QUES,
-		KC_UNDS,	KC_TILD,	KC_LBRC,	KC_LPRN,	KC_LCBR,	KC_RCBR,	KC_RPRN,	KC_RBRC,	KC_EQL ,	KC_BSPC,
-		KC_MINS,	KC_LT  ,	KC_GT  ,	KC_PIPE,	KC_BSLS,	KC_PSLS,	KC_DQUO,	KC_QUOT,	KC_GRV ,	KC_NO  ,
+		KC_NO  ,	KC_TILD,	KC_DQUO,	KC_QUOT,	KC_BSLS,	KC_LT  ,	KC_LCBR,	KC_LPRN,	KC_LBRC,	KC_EQL ,
+		KC_NO  ,	KC_MINS,	KC_UNDS,	KC_PIPE,	KC_PSLS,	KC_GT  ,	KC_RCBR,	KC_RPRN,	KC_RBRC,	KC_GRV ,
 		KC_NO  ,	KC_ENT ,	KC_SPC ,	KC_BSPC
 	),
     [2] = LAYOUT_split_3x5_2(
 		KC_EXLM,	KC_AT  ,	KC_HASH,	KC_DLR ,	KC_PERC,	KC_CIRC,	KC_AMPR,	KC_ASTR,	KC_PLUS,	KC_QUES,
-		KC_UNDS,	KC_TILD,	KC_LBRC,	KC_LPRN,	KC_LCBR,	KC_RCBR,	KC_RPRN,	KC_RBRC,	KC_EQL ,	KC_BSPC,
-		KC_MINS,	KC_LT  ,	KC_GT  ,	KC_PIPE,	KC_BSLS,	KC_PSLS,	KC_DQUO,	KC_QUOT,	KC_GRV ,	KC_NO  ,
+		KC_NO  ,	KC_TILD,	KC_DQUO,	KC_QUOT,	KC_BSLS,	KC_LT  ,	KC_LCBR,	KC_LPRN,	KC_LBRC,	KC_EQL ,
+		KC_NO  ,	KC_MINS,	KC_UNDS,	KC_PIPE,	KC_PSLS,	KC_GT  ,	KC_RCBR,	KC_RPRN,	KC_RBRC,	KC_GRV ,
 		KC_NO  ,	KC_ENT ,	KC_SPC ,	KC_BSPC
 	),
     [3] = LAYOUT_split_3x5_2(
-		KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_7,	KC_8,	KC_9,	KC_NO,
-		KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_0 ,	KC_4,	KC_5,	KC_6,	KC_NO,
-		KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_1,	KC_2,	KC_3,	KC_NO,
+		KC_NO,	KC_NO,	KC_7 ,	KC_8 ,	KC_9,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,
+		KC_NO,	KC_NO,	KC_4 ,	KC_5 ,	KC_6,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,
+		KC_NO,	KC_0 ,	KC_1 ,	KC_2 ,	KC_3,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_NO
 	),
     [4] = LAYOUT_split_3x5_2(
-		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_NO  ,	KC_NO  ,	KC_NO,	KC_NO   ,	KC_NO,
+		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_NO  ,	KC_PSCR,	KC_NO,	KC_NO   ,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_LEFT,	KC_DOWN,	KC_UP,	KC_RIGHT,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_NO  ,	KC_NO  ,	KC_NO,	KC_NO   ,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_BSPC
