@@ -14,6 +14,22 @@ enum {
     TD_COMM_SCLN
 };
 
+enum layer_names {
+    _BASE,
+    _L1,
+    _L2,
+    _L3,
+    _L4
+};
+
+enum custom_keycodes {
+    SYM_OVERLAY_L = SAFE_RANGE,
+    SYM_OVERLAY_R
+};
+
+static uint16_t sym_timer_left;
+static uint16_t sym_timer_right;
+
 // Tap Dance definitions
 tap_dance_action_t tap_dance_actions[] = {
     // Tap once for Escape, twice for Caps Lock
@@ -24,37 +40,71 @@ tap_dance_action_t tap_dance_actions[] = {
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT_split_3x5_2(
+    [_BASE] = LAYOUT_split_3x5_2(
 		KC_Q            ,	KC_W           ,	KC_E           ,	KC_R           ,	KC_T          ,	KC_Y          ,	KC_U          ,	KC_I            ,	KC_O           ,	KC_P        ,
 		TD( TD_A_ESC )  ,	LSFT_T( KC_S ) ,	LCTL_T( KC_D ) ,	LGUI_T( KC_F ) ,	LALT_T( KC_G ),	RALT_T( KC_H ),	RGUI_T( KC_J ),	RCTL_T( KC_K )  ,	RSFT_T( KC_L ) ,	KC_TAB      ,
 		KC_Z            ,	KC_X           ,	KC_C           ,	KC_V           ,	KC_B          ,	KC_N          ,	KC_M          ,	TD(TD_COMM_SCLN),	TD(TD_COMM_SCLN),	KC_CAPS_LOCK,
-		LT( 4, KC_BSPC ),	LT( 1, KC_ENT ),	LT( 2, KC_SPC ),	LT( 3, KC_BSPC)
+		LT( 4, KC_BSPC ),	SYM_OVERLAY_L,	SYM_OVERLAY_R,	LT( 3, KC_BSPC)
 	),
-    [1] = LAYOUT_split_3x5_2(
+    [_L1] = LAYOUT_split_3x5_2(
 		KC_EXLM,	KC_AT  ,	KC_HASH,	KC_DLR ,	KC_PERC,	KC_CIRC,	KC_AMPR,	KC_ASTR,	KC_PLUS,	KC_QUES,
 		KC_NO  ,	KC_TILD,	KC_DQUO,	KC_QUOT,	KC_BSLS,	KC_LT  ,	KC_LCBR,	KC_LPRN,	KC_LBRC,	KC_EQL ,
 		KC_NO  ,	KC_MINS,	KC_UNDS,	KC_PIPE,	KC_PSLS,	KC_GT  ,	KC_RCBR,	KC_RPRN,	KC_RBRC,	KC_GRV ,
 		KC_NO  ,	KC_ENT ,	KC_SPC ,	KC_BSPC
 	),
-    [2] = LAYOUT_split_3x5_2(
+    [_L2] = LAYOUT_split_3x5_2(
 		KC_EXLM,	KC_AT  ,	KC_HASH,	KC_DLR ,	KC_PERC,	KC_CIRC,	KC_AMPR,	KC_ASTR,	KC_PLUS,	KC_QUES,
 		KC_NO  ,	KC_TILD,	KC_DQUO,	KC_QUOT,	KC_BSLS,	KC_LT  ,	KC_LCBR,	KC_LPRN,	KC_LBRC,	KC_EQL ,
 		KC_NO  ,	KC_MINS,	KC_UNDS,	KC_PIPE,	KC_PSLS,	KC_GT  ,	KC_RCBR,	KC_RPRN,	KC_RBRC,	KC_GRV ,
 		KC_NO  ,	KC_ENT ,	KC_SPC ,	KC_BSPC
 	),
-    [3] = LAYOUT_split_3x5_2(
+    [_L3] = LAYOUT_split_3x5_2(
 		KC_NO,	KC_NO,	KC_7 ,	KC_8 ,	KC_9,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,
 		KC_NO,	KC_NO,	KC_4 ,	KC_5 ,	KC_6,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,
 		KC_NO,	KC_0 ,	KC_1 ,	KC_2 ,	KC_3,	KC_NO,	KC_NO,	KC_NO,	KC_NO,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_NO
 	),
-    [4] = LAYOUT_split_3x5_2(
+    [_L4] = LAYOUT_split_3x5_2(
 		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_NO  ,	KC_PSCR,	KC_NO,	KC_NO   ,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_LEFT,	KC_DOWN,	KC_UP,	KC_RIGHT,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_NO  ,	KC_NO,	KC_NO  ,	KC_NO  ,	KC_NO,	KC_NO   ,	KC_NO,
 		KC_NO,	KC_NO,	KC_NO,	KC_BSPC
 	),
 };
+
+static bool handle_sym_overlay(bool pressed, uint16_t *timer_store, bool is_left) {
+    uint8_t layer = is_left ? _L1 : _L2;
+    uint16_t tap_key = is_left ? KC_ENT : KC_SPC;
+
+    if (pressed) {
+        *timer_store = timer_read();
+        layer_on(layer);
+        register_code(KC_F19); // signal macOS/Hammerspoon -> show overlay
+    } else {
+        layer_off(layer);
+        unregister_code(KC_F19); // signal macOS/Hammerspoon -> hide overlay
+        if (timer_elapsed(*timer_store) < TAPPING_TERM) {
+            tap_code(tap_key);
+        }
+    }
+
+    return false; // we handled everything, so caller should return false
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+
+        case SYM_OVERLAY_L:
+            return handle_sym_overlay(record->event.pressed, &sym_timer_left, true);
+
+        case SYM_OVERLAY_R:
+            return handle_sym_overlay(record->event.pressed, &sym_timer_right, false);
+
+    }
+
+    return true;
+}
+
 // clang-format on
 
 #if defined( ENCODER_ENABLE ) && defined( ENCODER_MAP_ENABLE )
