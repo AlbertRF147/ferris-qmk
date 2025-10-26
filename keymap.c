@@ -1,5 +1,6 @@
 #include "keycodes.h"
 #include "keymap_us.h"
+#include <stdint.h>
 #include QMK_KEYBOARD_H
 
 /* THIS FILE WAS GENERATED!
@@ -71,24 +72,38 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		KC_NO,	KC_NO,	KC_NO,	KC_BSPC
 	),
 };
+// clang-format on
+
+static uint16_t hold_start_right = 0;
+static bool overlay_right_active = false;
+static uint16_t show_overlay_from_ms = 1000;
 
 static bool handle_sym_overlay(bool pressed, uint16_t *timer_store, bool is_left) {
     uint8_t layer = is_left ? _L1 : _L2;
     uint16_t tap_key = is_left ? KC_ENT : KC_SPC;
+    uint16_t *start = &hold_start_right;
+    bool *overlay = &overlay_right_active;
 
     if (pressed) {
-        *timer_store = timer_read();
+        *start = timer_read();
+        *overlay = false;
         layer_on(layer);
-        register_code(KC_F19); // signal macOS/Hammerspoon -> show overlay
     } else {
         layer_off(layer);
-        unregister_code(KC_F19); // signal macOS/Hammerspoon -> hide overlay
-        if (timer_elapsed(*timer_store) < TAPPING_TERM) {
-            tap_code(tap_key);
-        }
+        if (*overlay) unregister_code(KC_F19);
+        if (timer_elapsed(*start) < TAPPING_TERM) tap_code(tap_key);
+        *start = 0;
+        *overlay = false;
     }
-
     return false; // we handled everything, so caller should return false
+}
+
+void matrix_scan_user(void) {
+    if (hold_start_right && !overlay_right_active
+            && timer_elapsed(hold_start_right) > show_overlay_from_ms) {
+        register_code(KC_F19);
+        overlay_right_active = true;
+    }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -105,7 +120,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-// clang-format on
 
 #if defined( ENCODER_ENABLE ) && defined( ENCODER_MAP_ENABLE )
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
